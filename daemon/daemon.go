@@ -57,7 +57,6 @@ import (
 	"github.com/cilium/cilium/pkg/identity"
 	"github.com/cilium/cilium/pkg/identity/cache"
 	"github.com/cilium/cilium/pkg/identity/identitymanager"
-	"github.com/cilium/cilium/pkg/ip"
 	"github.com/cilium/cilium/pkg/ipam"
 	"github.com/cilium/cilium/pkg/ipcache"
 	"github.com/cilium/cilium/pkg/k8s"
@@ -916,28 +915,35 @@ func (d *Daemon) prepareAllocationCIDR(family datapath.NodeAddressingFamily) (ro
 	}
 
 	routerIP = family.Router()
-	if routerIP != nil && !allocRange.Contains(routerIP) {
-		log.Warningf("Detected allocation CIDR change to %s, previous router IP %s", allocRange, routerIP)
+	if routerIP != nil {
+		if allocRange.Contains(routerIP) {
+			err = d.ipam.AllocateIP(routerIP, "node")
+			if err != nil {
+				err = fmt.Errorf("Unable to allocate router IPv4 node IP %s from allocation range %s: %s",
+					routerIP, allocRange, err)
+				return
+			}
+		} else {
+			log.Warningf("Detected allocation CIDR change to %s, previous router IP %s", allocRange, routerIP)
 
-		// The restored router IP is not part of the allocation range.
-		// This indicates that the allocation range has changed.
-		if !option.Config.IsFlannelMasterDeviceSet() {
-			deleteHostDevice()
+			// The restored router IP is not part of the allocation range.
+			// This indicates that the allocation range has changed.
+			if !option.Config.IsFlannelMasterDeviceSet() {
+				deleteHostDevice()
+			}
+
+			// force re-allocation of the router IP
+			routerIP = nil
 		}
-
-		// force re-allocation of the router IP
-		routerIP = nil
 	}
 
 	if routerIP == nil {
-		routerIP = ip.GetNextIP(family.AllocationCIDR().IP)
-	}
-
-	err = d.ipam.AllocateIP(routerIP, "router")
-	if err != nil {
-		err = fmt.Errorf("Unable to allocate IPv4 router IP %s from allocation range %s: %s",
-			routerIP, allocRange, err)
-		return
+		routerIP, err = d.ipam.AllocateNextFamily(ipam.DeriveFamily(nodeIP), "router")
+		if err != nil {
+			err = fmt.Errorf("Unable to allocate IPv4 router IP %s from allocation range %s: %s",
+				routerIP, allocRange, err)
+			return
+		}
 	}
 
 	return

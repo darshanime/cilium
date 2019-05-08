@@ -43,6 +43,15 @@ const (
 	IPv4 Family = "ipv4"
 )
 
+// DeriveFamily returns the Family for a given IP
+func DeriveFamily(ip net.IP) Family {
+	if ip.To4() == nil {
+		return IPv6
+	}
+
+	return IPv4
+}
+
 // Configuration is the configuration of an IP address manager
 type Configuration struct {
 	EnableIPv4 bool
@@ -65,6 +74,14 @@ func NewIPAM(nodeAddressing datapath.NodeAddressing, c Configuration) *IPAM {
 
 		if c.EnableIPv4 {
 			ipam.IPv4Allocator = newHostScopeAllocator(nodeAddressing.IPv4().AllocationCIDR().IPNet)
+		}
+	case "crd":
+		if c.EnableIPv6 {
+			ipam.IPv6Allocator = newCRDAllocator(IPv6)
+		}
+
+		if c.EnableIPv4 {
+			ipam.IPv4Allocator = newCRDAllocator(IPv4)
 		}
 	default:
 		log.Fatalf("Unknown IPAM backend %s", option.Config.IPAM)
