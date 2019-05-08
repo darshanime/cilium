@@ -24,7 +24,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 	k8sAPI "k8s.io/kubernetes/pkg/apis/core"
-	"k8s.io/kubernetes/pkg/registry/core/service/ipallocator"
 )
 
 const (
@@ -89,7 +88,7 @@ func (ipam *IPAM) AllocateIPString(ipAddr, owner string) error {
 	return ipam.AllocateIP(ip, owner)
 }
 
-func (ipam *IPAM) allocateNextFamily(family Family, allocator *ipallocator.Range, owner string) (ip net.IP, err error) {
+func (ipam *IPAM) allocateNextFamily(family Family, allocator Allocator, owner string) (ip net.IP, err error) {
 	if allocator == nil {
 		return nil, fmt.Errorf("%s allocator not available", family)
 	}
