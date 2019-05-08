@@ -448,6 +448,9 @@ const (
 	// Metrics represents the metrics subsystem that Cilium should expose
 	// to prometheus.
 	Metrics = "metrics"
+
+	// IPAM is the IPAM method to use
+	IPAM = "ipam"
 )
 
 // FQDNS variables
@@ -900,6 +903,9 @@ type DaemonConfig struct {
 
 	// MetricsConfig is the configuration set in metrics
 	MetricsConfig metrics.Configuration
+
+	// IPAM is the IPAM method to use
+	IPAM string
 }
 
 var (
@@ -921,6 +927,7 @@ var (
 		KVStoreOpt:                make(map[string]string),
 		LogOpt:                    make(map[string]string),
 		SelectiveRegeneration:     defaults.SelectiveRegeneration,
+		IPAM:                      defaults.IPAM,
 	}
 )
 
@@ -1157,6 +1164,7 @@ func (c *DaemonConfig) Populate() {
 	c.HTTPRetryTimeout = viper.GetInt(HTTPRetryTimeout)
 	c.IPv4ClusterCIDRMaskSize = viper.GetInt(IPv4ClusterCIDRMaskSize)
 	c.IdentityChangeGracePeriod = viper.GetDuration(IdentityChangeGracePeriod)
+	c.IPAM = viper.GetString(IPAM)
 	c.IPv4Range = viper.GetString(IPv4Range)
 	c.IPv4NodeAddr = viper.GetString(IPv4NodeAddr)
 	c.IPv4ServiceRange = viper.GetString(IPv4ServiceRange)

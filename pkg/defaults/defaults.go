@@ -195,4 +195,7 @@ const (
 	// mirroring it into the kvstore for reduced overhead in large
 	// clusters.
 	K8sEventHandover = false
+
+	// IPAM is default IPAM backend to use
+	IPAM = "hostscope"
 )
