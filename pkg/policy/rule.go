@@ -24,7 +24,7 @@ import (
 	"github.com/cilium/cilium/pkg/option"
 	"github.com/cilium/cilium/pkg/policy/api"
 
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type rule struct {
@@ -80,7 +80,7 @@ func mergePortProto(ctx *SearchContext, endpoints []api.EndpointSelector, existi
 			existingFilter.L7Parser = filterToMerge.L7Parser
 		} else if filterToMerge.L7Parser != existingFilter.L7Parser {
 			ctx.PolicyTrace("   Merge conflict: mismatching parsers %s/%s\n", filterToMerge.L7Parser, existingFilter.L7Parser)
-			return fmt.Errorf("Cannot merge conflicting L7 parsers (%s/%s)", filterToMerge.L7Parser, existingFilter.L7Parser)
+			return fmt.Errorf("cannot merge conflicting L7 parsers (%s/%s)", filterToMerge.L7Parser, existingFilter.L7Parser)
 		}
 	}
 
@@ -90,7 +90,7 @@ func mergePortProto(ctx *SearchContext, endpoints []api.EndpointSelector, existi
 			case len(newL7Rules.HTTP) > 0:
 				if len(ep.Kafka) > 0 || len(ep.DNS) > 0 || ep.L7Proto != "" {
 					ctx.PolicyTrace("   Merge conflict: mismatching L7 rule types.\n")
-					return fmt.Errorf("Cannot merge conflicting L7 rule types")
+					return fmt.Errorf("cannot merge conflicting L7 rule types")
 				}
 
 				for _, newRule := range newL7Rules.HTTP {
@@ -101,7 +101,7 @@ func mergePortProto(ctx *SearchContext, endpoints []api.EndpointSelector, existi
 			case len(newL7Rules.Kafka) > 0:
 				if len(ep.HTTP) > 0 || len(ep.DNS) > 0 || ep.L7Proto != "" {
 					ctx.PolicyTrace("   Merge conflict: mismatching L7 rule types.\n")
-					return fmt.Errorf("Cannot merge conflicting L7 rule types")
+					return fmt.Errorf("cannot merge conflicting L7 rule types")
 				}
 
 				for _, newRule := range newL7Rules.Kafka {
@@ -112,7 +112,7 @@ func mergePortProto(ctx *SearchContext, endpoints []api.EndpointSelector, existi
 			case newL7Rules.L7Proto != "":
 				if len(ep.Kafka) > 0 || len(ep.HTTP) > 0 || len(ep.DNS) > 0 || (ep.L7Proto != "" && ep.L7Proto != newL7Rules.L7Proto) {
 					ctx.PolicyTrace("   Merge conflict: mismatching L7 rule types.\n")
-					return fmt.Errorf("Cannot merge conflicting L7 rule types")
+					return fmt.Errorf("cannot merge conflicting L7 rule types")
 				}
 				if ep.L7Proto == "" {
 					ep.L7Proto = newL7Rules.L7Proto
@@ -126,7 +126,7 @@ func mergePortProto(ctx *SearchContext, endpoints []api.EndpointSelector, existi
 			case len(newL7Rules.DNS) > 0:
 				if len(ep.HTTP) > 0 || len(ep.Kafka) > 0 || len(ep.L7) > 0 {
 					ctx.PolicyTrace("   Merge conflict: mismatching L7 rule types.\n")
-					return fmt.Errorf("Cannot merge conflicting L7 rule types")
+					return fmt.Errorf("cannot merge conflicting L7 rule types")
 				}
 
 				for _, newRule := range newL7Rules.DNS {

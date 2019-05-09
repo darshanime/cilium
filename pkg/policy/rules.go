@@ -19,8 +19,7 @@ import (
 	"strconv"
 
 	"github.com/cilium/cilium/pkg/policy/api"
-
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // ruleSlice is a wrapper around a slice of *rule, which allows for functions
@@ -61,34 +60,6 @@ loop:
 			if r.canReachFromEndpoints(ctx, &state) == api.Allowed {
 				decision = api.Allowed
 			}
-		}
-	}
-
-	state.trace(rules, ctx)
-
-	return decision
-}
-
-func (rules ruleSlice) analyzeIngressRequirements(ctx *SearchContext) api.Decision {
-	decision := api.Undecided
-	state := traceState{}
-
-loop:
-	for i, r := range rules {
-		state.ruleID = i
-
-		if !ctx.rulesSelect {
-			if !r.EndpointSelector.Matches(ctx.To) {
-				state.unSelectRule(ctx, ctx.To, r)
-				continue
-			}
-		}
-
-		state.selectRule(ctx, r)
-
-		if r.meetsRequirementsIngress(ctx, &state) == api.Denied {
-			decision = api.Denied
-			break loop
 		}
 	}
 
@@ -324,34 +295,6 @@ egressLoop:
 	egressState.trace(rules, egressCtx)
 
 	return egressDecision
-}
-
-func (rules ruleSlice) analyzeEgressRequirements(ctx *SearchContext) api.Decision {
-	decision := api.Undecided
-	state := traceState{}
-
-loop:
-	for i, r := range rules {
-		state.ruleID = i
-
-		if !ctx.rulesSelect {
-			if !r.EndpointSelector.Matches(ctx.From) {
-				state.unSelectRule(ctx, ctx.From, r)
-				return api.Undecided
-			}
-		}
-
-		state.selectRule(ctx, r)
-
-		if r.meetsRequirementsEgress(ctx, &state) == api.Denied {
-			decision = api.Denied
-			break loop
-		}
-	}
-
-	state.trace(rules, ctx)
-
-	return decision
 }
 
 // updateEndpointsCaches iterates over a given list of rules to update the cache

@@ -27,12 +27,6 @@ var (
 		Identity:         identity.ReservedIdentityHost.Uint32(),
 		TrafficDirection: trafficdirection.Ingress.Uint8(),
 	}
-
-	// worldKey represents an ingress L3 allow from the world.
-	worldKey = Key{
-		Identity:         identity.ReservedIdentityWorld.Uint32(),
-		TrafficDirection: trafficdirection.Ingress.Uint8(),
-	}
 )
 
 // MapState is a state of a policy map.

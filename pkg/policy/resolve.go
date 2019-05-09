@@ -196,7 +196,6 @@ func (p *EndpointPolicy) computeDesiredL4PolicyMapEntries(identityCache cache.Id
 	}
 	p.computeDirectionL4PolicyMapEntries(identityCache, p.L4Policy.Ingress, trafficdirection.Ingress, p.DeniedIngressIdentities)
 	p.computeDirectionL4PolicyMapEntries(identityCache, p.L4Policy.Egress, trafficdirection.Egress, p.DeniedEgressIdentities)
-	return
 }
 
 func (p *EndpointPolicy) computeDirectionL4PolicyMapEntries(identityCache cache.IdentityCache, l4PolicyMap L4PolicyMap, direction trafficdirection.TrafficDirection, deniedIdentities cache.IdentityCache) {

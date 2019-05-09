@@ -30,8 +30,8 @@ import (
 	"github.com/cilium/cilium/pkg/labels"
 	"github.com/cilium/cilium/pkg/option"
 	"github.com/cilium/cilium/pkg/policy/api"
+	logging "github.com/op/go-logging"
 
-	"github.com/op/go-logging"
 	. "gopkg.in/check.v1"
 )
 
@@ -324,7 +324,7 @@ func (ds *PolicyTestSuite) TestL4Policy(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(res, IsNil)
 
-	res2, err = rule2.resolveEgressPolicy(fromFoo, &egressState, NewL4Policy(), nil)
+	_, err = rule2.resolveEgressPolicy(fromFoo, &egressState, NewL4Policy(), nil)
 	c.Assert(err, IsNil)
 	c.Assert(res, IsNil)
 
@@ -1562,8 +1562,6 @@ var (
 
 	ctxAToB = SearchContext{From: labelsA, To: labelsB, Trace: TRACE_VERBOSE}
 	ctxAToC = SearchContext{From: labelsA, To: labelsC, Trace: TRACE_VERBOSE}
-
-	ctxFromA = SearchContext{From: labelsA, Trace: TRACE_VERBOSE}
 )
 
 func expectResult(c *C, expected, obtained api.Decision, buffer *bytes.Buffer) {
