@@ -122,7 +122,7 @@ func NewBuildQueue(name string) *BuildQueue {
 		name:             name,
 		buildStatus:      buildStatusMap{},
 		workerBuildQueue: make(chan Builder, buildQueueSize),
-		stopWorker:       make(chan struct{}, 0),
+		stopWorker:       make(chan struct{}),
 		regularBuilds: buildGroup{
 			condition: func(q *BuildQueue) bool {
 				return q.exclusiveBuilds.waiting == 0 && q.exclusiveBuilds.running == 0
@@ -580,9 +580,9 @@ func (q *BuildQueue) checkBuildGuarantees() error {
 
 	switch {
 	case q.exclusiveBuilds.running > 1:
-		return fmt.Errorf("More than one exclusive build is running")
+		return fmt.Errorf("more than one exclusive build is running")
 	case q.exclusiveBuilds.running > 0 && q.regularBuilds.running > 0:
-		return fmt.Errorf("Exclusive build is running in parallel with regular build")
+		return fmt.Errorf("exclusive build is running in parallel with regular build")
 	default:
 		for uuid, count := range buildCount {
 			if count > 1 {

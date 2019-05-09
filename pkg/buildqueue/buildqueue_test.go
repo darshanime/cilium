@@ -404,8 +404,8 @@ func (s *BuildQueueTestSuite) TestBuildGuarantees(c *C) {
 		builders[i] = builder
 
 		if i%4 == 0 {
+			allBuilds.Add(1)
 			go func(builder *testBuilder) {
-				allBuilds.Add(1)
 				c := bq.PreemptExclusive(builder)
 				go func() {
 					<-c
