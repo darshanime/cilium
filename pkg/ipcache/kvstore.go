@@ -197,7 +197,7 @@ func UpsertIPToKVStore(ctx context.Context, IP, hostIP net.IP, ID identity.Numer
 func keyToIPNet(key string) (parsedPrefix *net.IPNet, host bool, err error) {
 	requiredPrefix := fmt.Sprintf("%s/", path.Join(IPIdentitiesPath, AddressSpace))
 	if !strings.HasPrefix(key, requiredPrefix) {
-		err = fmt.Errorf("Found invalid key %s outside of prefix %s", key, IPIdentitiesPath)
+		err = fmt.Errorf("found invalid key %s outside of prefix %s", key, IPIdentitiesPath)
 		return
 	}
 
@@ -378,7 +378,7 @@ func (iw *IPIdentityWatcher) waitForInitialSync() {
 
 var (
 	watcher     *IPIdentityWatcher
-	initialized = make(chan struct{}, 0)
+	initialized = make(chan struct{})
 )
 
 // InitIPIdentityWatcher initializes the watcher for ip-identity mapping events
